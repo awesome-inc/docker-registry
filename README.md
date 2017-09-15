@@ -54,6 +54,23 @@ Generating intermediate self-signed certificates for testing pruposes is describ
 
 - [Use self-signed certificates](https://docs.docker.com/registry/insecure/#use-self-signed-certificates)
 
+## Docker cleanup
+
+Dockerized continous integration leaves its traces on disk. Mostly these are due to `docker pull` && and `docker build`.
+Every once in a while we need to cleanup, cf. [Cleaning up docker to reclaim disk space](https://lebkowski.name/docker-volumes/).
+
+Manual cleanup
+
+```bash
+sudo ./cleanup-docker.sh
+```
+
+Setup as a cron job each hour `sudo crontab -e`
+
+```bash
+0 * * * * /path/.../cleanup_docker.sh
+```
+
 ## FAQ
 
 ### On Windows i get VirtualBox error: VTX not available. What's wrong?
