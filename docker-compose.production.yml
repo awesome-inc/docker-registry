@@ -1,0 +1,41 @@
+version: '3.4'
+
+x-base: &base
+  logging:
+    driver: "json-file"
+    options:
+      max-size: "10m"
+      max-file: "5"
+  # https://docs.docker.com/compose/compose-file/#restart
+  restart: on-failure
+  # when deployed using docker swarm, cf.: https://docs.docker.com/compose/compose-file/#restart_policy
+
+volumes:
+  registry_volume:
+  ui3-data: 
+
+services:
+  # cf.: https://docs.docker.com/registry/deploying/
+  registry:
+    <<: *base
+    image: registry:2.6.2
+    ports:
+      - "5000:5000"
+    volumes:
+      - registry_volume:/var/lib/registry
+      #- ./registry/certs:/certs
+    environment:
+      REGISTRY_STORAGE_DELETE_ENABLED: "true"
+      #REGISTRY_HTTP_TLS_CERTIFICATE: /certs/domain.crt
+      #REGISTRY_HTTP_TLS_KEY: /certs/domain.key
+
+  ui3:
+    <<: *base
+    image: quiq/docker-registry-ui:0.6
+    volumes:
+      - "./ui3/config.yml:/opt/config.yml:ro"
+      - "ui3-data:/opt/data"
+    ports:
+      - "80:8000"
+    depends_on:
+      - registry
